@@ -1,7 +1,12 @@
 package main
 
 import (
+	"fmt"
+	"os"
+	"strconv"
 	"time"
+
+	"github.com/wormggmm/gocmd/shell"
 
 	"github.com/wormggmm/gocmd/common"
 	"github.com/wormggmm/gocmd/show"
@@ -15,41 +20,44 @@ func (s *TestDataSource) Data() string {
 	return s.Str
 }
 func main() {
-	// fmt.Print("\r\033[K")
-	// c := &common.ScreenController{}
-	// c.Reset()
-	// c.ClearAll()
-	// rand.Seed(time.Now().UnixMilli())
-	// for i := 0; i < 50; i++ {
-	// 	row := rand.Intn(50)
-	// 	col := rand.Intn(300)
-	// 	c.SetCursorPos(row, col)
-	// 	fmt.Print("A")
-	// 	time.Sleep(500 * time.Millisecond)
+	linesStr := "40"
+	columnsStr := "200"
+	if len(os.Args) >= 3 {
+		linesStr = os.Args[1]
+		columnsStr = os.Args[2]
+	}
+	fmt.Printf("lines:%s columns:%s\n", linesStr, columnsStr)
+	lines, err := strconv.Atoi(linesStr)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	// columns, err := strconv.Atoi(columnsStr)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	os.Exit(1)
 	// }
-	// c.ClearLine()
-	// c.FontColor(common.EnumColor.Red)
-	// c.FontBackColor(common.EnumColor.Green)
-	// c.Blink()
-	// fmt.Print("hello")
-	// cmd.CMD().Start()
-	// time.Sleep(2 * time.Second)
-	// cmd.CMD().Stop()
-	// c.ClearAll()
-	// c.Reset()
+	time.Sleep(1 * time.Second)
+	c := &common.ScreenController{}
+	c.Reset()
+	c.ClearAll()
 	dataSrc := &TestDataSource{}
-	b := show.NewBlock(10, 10, 20, 10, dataSrc)
-	b.SetFrame('*', true, common.EnumColor.Red)
+	b1 := show.NewBlock(2, 2, 5, 10, dataSrc)
+	b1.SetFrame('*', true, common.EnumColor.Red)
 	mgr := show.NewManager()
-	mgr.AddBlock(b)
+	mgr.AddBlock(b1)
 	mgr.Start()
+
+	sh := &shell.Shell{}
+	b2 := show.NewBlock(lines-6, 2, 5, 10, sh)
+	b2.SetFrame('O', true, common.EnumColor.Blue)
+	mgr.AddBlock(b2)
 
 	for i := 0; i < 20; i++ {
 		dataSrc.Str += "A"
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(300 * time.Millisecond)
 	}
 	time.Sleep(5 * time.Second)
-	c := &common.ScreenController{}
 	c.Reset()
 	c.ClearAll()
 	c.SetCursorPos(0, 0)
