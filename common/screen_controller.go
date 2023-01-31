@@ -6,6 +6,7 @@ import (
 
 type TColorEnum int
 type colorEnum struct {
+	Idle   TColorEnum
 	Black  TColorEnum
 	Red    TColorEnum
 	Green  TColorEnum
@@ -17,6 +18,7 @@ type colorEnum struct {
 }
 
 var EnumColor = colorEnum{
+	Idle:   -1,
 	Black:  0,
 	Red:    1,
 	Green:  2,

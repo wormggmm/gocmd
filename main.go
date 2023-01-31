@@ -7,6 +7,13 @@ import (
 	"github.com/wormggmm/gocmd/show"
 )
 
+type TestDataSource struct {
+	Str string
+}
+
+func (s *TestDataSource) Data() string {
+	return s.Str
+}
 func main() {
 	// fmt.Print("\r\033[K")
 	// c := &common.ScreenController{}
@@ -30,10 +37,15 @@ func main() {
 	// cmd.CMD().Stop()
 	// c.ClearAll()
 	// c.Reset()
+	dataSrc := &TestDataSource{}
+	b := show.NewBlock(10, 10, 20, 10, dataSrc)
+	b.SetFrame('*', true, common.EnumColor.Red)
+	mgr := show.NewManager()
+	mgr.AddBlock(b)
+	mgr.Start()
 
-	b := show.NewBlock(10, 10, 50, 1)
-	for i := 0; i < 2; i++ {
-		b.Printf("01234567890123456789\n")
+	for i := 0; i < 20; i++ {
+		dataSrc.Str += "A"
 		time.Sleep(500 * time.Millisecond)
 	}
 	time.Sleep(5 * time.Second)

@@ -1,18 +1,21 @@
 package show
 
 import (
-	"fmt"
 	"time"
+
+	"github.com/wormggmm/gocmd/common"
 )
 
 type Manager struct {
-	blocks []*Block
-	exitCh chan interface{}
+	blocks     []IDrawable
+	exitCh     chan interface{}
+	controller *common.ScreenController
 }
 
 func NewManager() *Manager {
 	return &Manager{
-		exitCh: make(chan interface{}),
+		exitCh:     make(chan interface{}),
+		controller: &common.ScreenController{},
 	}
 }
 func (s *Manager) Start() {
@@ -21,7 +24,8 @@ func (s *Manager) Start() {
 func (s *Manager) Stop() {
 	close(s.exitCh)
 }
-func (s *Manager) AddBlock(block *Block) {
+func (s *Manager) AddBlock(block IDrawable) {
+	s.blocks = append(s.blocks, block)
 }
 
 func (s *Manager) update() {
@@ -37,5 +41,9 @@ func (s *Manager) update() {
 	}
 }
 func (s *Manager) draw() {
-	fmt.Println("Manager draw")
+	s.controller.SaveCursorPos()
+	for _, b := range s.blocks {
+		b.Draw()
+	}
+	s.controller.LoadCursorPos()
 }
