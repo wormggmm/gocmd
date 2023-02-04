@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/wormggmm/gocmd/shell"
-	"github.com/wormggmm/gocmd/show/comp"
 
 	"github.com/wormggmm/gocmd/common"
 	"github.com/wormggmm/gocmd/show"
@@ -49,19 +48,29 @@ func main() {
 	// mgr.AddBlock(b1)
 	mgr.Start()
 	input := shell.NewInput()
-	testShellProcessor := &TestShellProcessor{input: input}
-	sh := shell.NewShell(testShellProcessor)
+	sh := shell.NewShell()
+	testShellProcessor := &TestShellProcessor{cmd: func(cmd string) {
+		if cmd == "exit" {
+			input.Stop()
+			os.Exit(0)
+		}
+	},
+		cmdList: func() []string {
+			return []string{"exit"}
+		},
+	}
+	sh.SetReceiver(testShellProcessor)
 	input.SetReceiver(sh)
-	b2 := show.NewBlock(lines-6, 2, 5, 10, sh)
+	b2 := show.NewBlock(lines-6, 2, 20, 10, sh)
 	// b2.SetFrame('O', true, common.EnumColor.Blue)
 	mgr.AddBlock(b2)
-	pb := comp.NewProgressBar("test:", '#', 30, '-')
-	b3 := show.NewBlock(2+5+2, 2, 1, 50, pb)
-	mgr.AddBlock(b3)
+	// pb := comp.NewProgressBar("test:", '#', 30, '-')
+	// b3 := show.NewBlock(2+5+2, 2, 1, 50, pb)
+	// mgr.AddBlock(b3)
 	input.Start()
 	defer input.Stop()
 	for i := 0; i < 20; i++ {
-		pb.Set(float64((1+i)*5) / 100)
+		// pb.Set(float64((1+i)*5) / 100)
 		// dataSrc.Str += "A"
 		time.Sleep(300 * time.Millisecond)
 	}
@@ -72,12 +81,19 @@ func main() {
 }
 
 type TestShellProcessor struct {
-	input *shell.Input
+	cmd      func(cmd string)
+	cmdTable func(cmd string)
+	cmdList  func() []string
 }
 
 func (s *TestShellProcessor) Cmd(cmd string) {
-	if cmd == "exit" {
-		s.input.Stop()
-		os.Exit(0)
-	}
+	s.cmd(cmd)
+}
+
+func (s *TestShellProcessor) CmdTable(cmd string) {
+	s.cmdTable(cmd)
+}
+
+func (s *TestShellProcessor) CmdList() []string {
+	return s.cmdList()
 }

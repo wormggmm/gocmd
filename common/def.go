@@ -24,4 +24,6 @@ type IInputReceiver interface {
 
 type ICmdReceiver interface {
 	Cmd(cmd string)
+	// CmdTable(cmd string)
+	CmdList() []string
 }
