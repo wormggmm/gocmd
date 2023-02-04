@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/wormggmm/gocmd/shell"
+	"github.com/wormggmm/gocmd/show/comp"
 
 	"github.com/wormggmm/gocmd/common"
 	"github.com/wormggmm/gocmd/show"
@@ -41,20 +42,25 @@ func main() {
 	c := &common.ScreenController{}
 	c.Reset()
 	c.ClearAll()
-	dataSrc := &TestDataSource{}
-	b1 := show.NewBlock(2, 2, 5, 10, dataSrc)
-	b1.SetFrame('*', true, common.EnumColor.Red)
+	// dataSrc := &TestDataSource{}
+	// b1 := show.NewBlock(2, 2, 5, 10, dataSrc)
+	// b1.SetFrame('*', true, common.EnumColor.Red)
 	mgr := show.NewManager()
-	mgr.AddBlock(b1)
+	// mgr.AddBlock(b1)
 	mgr.Start()
 
 	sh := &shell.Shell{}
 	b2 := show.NewBlock(lines-6, 2, 5, 10, sh)
-	b2.SetFrame('O', true, common.EnumColor.Blue)
+	// b2.SetFrame('O', true, common.EnumColor.Blue)
 	mgr.AddBlock(b2)
 
+	pb := comp.NewProgressBar("test:", '#', 30, '-')
+	b3 := show.NewBlock(2+5+2, 2, 1, 50, pb)
+	mgr.AddBlock(b3)
+
 	for i := 0; i < 20; i++ {
-		dataSrc.Str += "A"
+		pb.Set(float64((1+i)*5) / 100)
+		// dataSrc.Str += "A"
 		time.Sleep(300 * time.Millisecond)
 	}
 	time.Sleep(5 * time.Second)
