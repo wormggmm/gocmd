@@ -7,25 +7,35 @@ import (
 )
 
 type Manager struct {
-	blocks     []IDrawable
-	exitCh     chan interface{}
-	controller *common.ScreenController
+	blocks       map[int64]IDrawable
+	exitCh       chan interface{}
+	drawCh       chan IDrawable
+	updateTicker *time.Ticker
+	controller   *common.ScreenController
 }
 
 func NewManager() *Manager {
 	return &Manager{
+		blocks:     map[int64]IDrawable{},
 		exitCh:     make(chan interface{}),
+		drawCh:     make(chan IDrawable, 10),
 		controller: &common.ScreenController{},
 	}
 }
 func (s *Manager) Start() {
+	s.updateTicker = time.NewTicker(1 * time.Second)
 	go s.update()
 }
 func (s *Manager) Stop() {
 	close(s.exitCh)
 }
 func (s *Manager) AddBlock(block IDrawable) {
-	s.blocks = append(s.blocks, block)
+	block.SetManager(s)
+	s.blocks[block.ID()] = block
+}
+
+func (s *Manager) FlushDraw(block IDrawable) {
+	s.drawCh <- block
 }
 
 func (s *Manager) update() {
@@ -34,10 +44,13 @@ func (s *Manager) update() {
 		select {
 		case <-s.exitCh:
 			exit = true
-		default:
+		case drawBlock := <-s.drawCh:
+			s.controller.SaveCursorPos()
+			drawBlock.Draw()
+			s.controller.LoadCursorPos()
+		case <-s.updateTicker.C:
 			s.draw()
 		}
-		time.Sleep(1000 * time.Millisecond)
 	}
 }
 func (s *Manager) draw() {

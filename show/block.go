@@ -3,13 +3,16 @@ package show
 import (
 	"fmt"
 
+	"github.com/wormggmm/gocmd/utils"
+
 	"github.com/wormggmm/gocmd/common"
 )
 
-// TODO:
-// 1. 封装print函数，对换行的支持，以及超过width后的折行
+// 封装print函数，对换行的支持，以及超过width后的折行
 type Block struct {
 	controller *common.ScreenController
+	manager    *Manager
+	id         int64
 	row        int
 	col        int
 	height     int
@@ -22,7 +25,8 @@ type Block struct {
 }
 
 func NewBlock(row, col, height, width int, dataSrc common.IDataSource) *Block {
-	return &Block{
+	b := &Block{
+		id:         utils.GenUUID().Int64(),
 		row:        row,
 		col:        col,
 		height:     height,
@@ -32,6 +36,17 @@ func NewBlock(row, col, height, width int, dataSrc common.IDataSource) *Block {
 		dataSrc:    dataSrc,
 		frameColor: common.EnumColor.Idle,
 	}
+	dataSrc.Listener(b)
+	return b
+}
+func (s *Block) SetManager(manager *Manager) {
+	s.manager = manager
+}
+func (s *Block) DataChanged() {
+	s.manager.FlushDraw(s)
+}
+func (s *Block) ID() int64 {
+	return s.id
 }
 func (s *Block) setDataSource(dataSrc common.IDataSource) {
 	s.dataSrc = dataSrc
@@ -54,6 +69,10 @@ func (s *Block) globalCursorPosY() int {
 }
 func (s *Block) globalCursorPosX() int {
 	return s.col + s.cursorPos.X
+}
+
+func (s *Block) ApplyCursorPos() {
+	s.applyCursorPos()
 }
 func (s *Block) applyCursorPos() {
 	s.controller.SetCursorPos(s.globalCursorPosY(), s.globalCursorPosX())

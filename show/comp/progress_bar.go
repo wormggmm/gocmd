@@ -3,6 +3,8 @@ package comp
 import (
 	"fmt"
 	"strings"
+
+	"github.com/wormggmm/gocmd/common"
 )
 
 type ProgressBar struct {
@@ -27,6 +29,7 @@ func NewProgressBar(tag string, char rune, length int, charEmpty ...rune) *Progr
 	}
 	return pb
 }
+func (s *ProgressBar) Listener(listener common.IDataListener) {}
 func (s *ProgressBar) Set(progress float64) {
 	s.progress = progress
 }

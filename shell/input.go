@@ -1,13 +1,21 @@
 package shell
 
 import (
-	"fmt"
+	"github.com/wormggmm/gocmd/common"
 
 	"github.com/eiannone/keyboard"
 )
 
-type Input struct{}
+type Input struct {
+	receiver common.IInputReceiver
+	exitCh   chan interface{}
+}
 
+func NewInput() *Input {
+	return &Input{
+		exitCh: make(chan interface{}),
+	}
+}
 func (s *Input) Start() error {
 	if err := keyboard.Open(); err != nil {
 		return err
@@ -17,18 +25,33 @@ func (s *Input) Start() error {
 }
 
 func (s *Input) Stop() {
+	close(s.exitCh)
 	keyboard.Close()
 }
 
+func (s *Input) SetReceiver(receiver common.IInputReceiver) {
+	s.receiver = receiver
+}
 func (s *Input) listening() {
-	for {
-		char, key, err := keyboard.GetKey()
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("You pressed: rune %q, key %X\r\n", char, key)
-		if key == keyboard.KeyEsc {
-			break
+	stop := false
+	for !stop {
+		select {
+		case <-s.exitCh:
+			stop = true
+		default:
+			char, key, err := keyboard.GetKey()
+			if err != nil {
+				panic(err)
+			}
+			// fmt.Printf("You pressed: rune %q, key %X\r\n", char, key)
+			if s.receiver == nil {
+				continue
+			}
+			if key != 0 {
+				s.receiver.InputKey(key)
+			} else {
+				s.receiver.InputChar(char)
+			}
 		}
 	}
 }
