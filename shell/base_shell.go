@@ -6,10 +6,9 @@ import (
 )
 
 type BaseShell struct {
-	hooker      IShellHooker
-	listener    common.IDataListener
-	lines       []string
-	currentLine string
+	common.TextContent
+	hooker   IShellHooker
+	listener common.IDataListener
 }
 
 func NewBaseShell(hooker IShellHooker) *BaseShell {
@@ -21,22 +20,13 @@ func (s *BaseShell) Listener(listener common.IDataListener) {
 	s.listener = listener
 }
 func (s *BaseShell) InputChar(char rune) {
-	// s.content += string(char)
-	if char == '\n' {
-		s.enterLine()
-	} else {
-		s.currentLine += string(char)
-	}
+	s.TextContent.InputChar(char)
 	if s.hooker != nil {
 		s.hooker.CurrentLineChange()
 	}
 	if s.listener != nil {
 		s.listener.DataChanged()
 	}
-}
-func (s *BaseShell) enterLine() {
-	s.lines = append(s.lines, s.currentLine)
-	s.currentLine = ""
 }
 func (s *BaseShell) InputKey(key keyboard.Key) {
 	switch key {
@@ -45,18 +35,16 @@ func (s *BaseShell) InputKey(key keyboard.Key) {
 			s.hooker.KeyEnter()
 			s.hooker.CurrentLineChange()
 		}
-		// s.content += "\n"
-		s.enterLine()
+		s.TextContent.EnterLine()
 		if s.hooker != nil {
 			s.hooker.KeyAfterEnter()
 		}
 	case keyboard.KeyBackspace2:
-		if len(s.currentLine) > 0 {
+		if s.CurrentLineLen() > 0 {
 			if s.hooker.KeyBeforeBackspace() {
 				break
 			}
-			// s.content = s.content[0 : len(s.content)-1]
-			s.currentLine = s.currentLine[0 : len(s.currentLine)-1]
+			s.BackSpace()
 			if s.hooker != nil {
 				s.hooker.CurrentLineChange()
 			}

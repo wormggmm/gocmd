@@ -22,7 +22,7 @@ func (s *Shell) SetReceiver(receiver common.ICmdReceiver) {
 	s.receiver = receiver
 }
 func (s *Shell) KeyBeforeBackspace() (isBreak bool) {
-	if len(s.currentLine) == 1 && s.currentLine[0] == '>' {
+	if len(s.getCurrentLine()) == 1 && s.getCurrentLine()[0] == '>' {
 		return true
 	}
 	return false
@@ -37,10 +37,10 @@ func (s *Shell) KeyEnter() {
 	}
 }
 func (s *Shell) setCurrentLine(content string) {
-	s.currentLine = ">" + content
+	s.BaseShell.SetCurrentLine(">" + content)
 }
 func (s *Shell) getCurrentLine() string {
-	cmd := s.currentLine
+	cmd := s.CurrentLine()
 	cmd = strings.TrimLeft(cmd, ">")
 	return cmd
 }
@@ -55,25 +55,14 @@ func (s *Shell) KeyTable() {
 		for _, cmd := range cmdList {
 			if strings.Index(cmd, currentCmd) == 0 {
 				// s.content += cmd + "\t"
-				s.currentLine += cmd + "\t"
+				// s.currentLine += cmd + "\t"
+				s.SetCurrentLine(s.getCurrentLine() + cmd + "\t")
 			}
 		}
 		// s.InputChar('\n')
 		// s.content += currentCmd
-		s.enterLine()
+		s.EnterLine()
 		s.setCurrentLine(currentCmd)
 	}
 	s.tableKey = true
-}
-func (s *Shell) Data() string {
-	content := ""
-	for _, line := range s.lines {
-		content += (line + "\n")
-	}
-	content += (s.currentLine)
-	return content + "_"
-}
-func (s *Shell) LinesData() []string {
-	lines := append(s.lines, s.currentLine)
-	return lines
 }

@@ -62,7 +62,7 @@ func main() {
 	}
 	sh.SetReceiver(testShellProcessor)
 	input.SetReceiver(sh)
-	b2 := show.NewBlock(lines-6, 2, 5, 50, sh)
+	b2 := show.NewBlock(lines-6, 2, 5, 10, sh)
 	b2.SetFrame('O', false, common.EnumColor.Blue)
 	mgr.AddBlock(b2)
 	// pb := comp.NewProgressBar("test:", '#', 30, '-')
