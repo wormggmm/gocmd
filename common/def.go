@@ -10,6 +10,7 @@ type Pos struct {
 }
 
 type IDataSource interface {
+	LinesData() []string
 	Data() string
 	Listener(listener IDataListener)
 }

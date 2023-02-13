@@ -20,7 +20,7 @@ func (s *TestDataSource) Data() string {
 	return s.Str
 }
 func main() {
-	linesStr := "40"
+	linesStr := "50"
 	columnsStr := "200"
 	if len(os.Args) >= 3 {
 		linesStr = os.Args[1]
@@ -47,6 +47,7 @@ func main() {
 	mgr := show.NewManager()
 	// mgr.AddBlock(b1)
 	mgr.Start()
+	mgr.SetCursorPos(0, 0)
 	input := shell.NewInput()
 	sh := shell.NewShell()
 	testShellProcessor := &TestShellProcessor{cmd: func(cmd string) {
@@ -61,8 +62,8 @@ func main() {
 	}
 	sh.SetReceiver(testShellProcessor)
 	input.SetReceiver(sh)
-	b2 := show.NewBlock(lines-6, 2, 20, 10, sh)
-	// b2.SetFrame('O', true, common.EnumColor.Blue)
+	b2 := show.NewBlock(lines-6, 2, 5, 50, sh)
+	b2.SetFrame('O', false, common.EnumColor.Blue)
 	mgr.AddBlock(b2)
 	// pb := comp.NewProgressBar("test:", '#', 30, '-')
 	// b3 := show.NewBlock(2+5+2, 2, 1, 50, pb)

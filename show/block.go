@@ -128,7 +128,57 @@ func (s *Block) Draw() {
 	s.Clear()
 	s.drawFrame()
 	s.setCursorPos(0, 0)
-	s.Printf(s.dataSrc.Data())
+	// s.Printf(s.dataSrc.Data())
+	s.PrintLines(s.dataSrc.LinesData())
+}
+func (s *Block) PrintLines(lines []string) {
+	lineCount := len(lines)
+	if lineCount == 0 {
+		return
+	}
+	cursorY := s.height
+	for r := 0; r < s.height; {
+		if lineCount < r+1 {
+			break
+		}
+		lineContent := lines[lineCount-r-1]
+		lineRowContents := s.calRowContents(lineContent)
+		lineRowCount := len(lineRowContents)
+		lineIdx := 0
+		for y := cursorY - 1; y >= 0; {
+			if lineRowCount-lineIdx-1 < 0 {
+				break
+			}
+			s.setCursorPosY(y)
+			s.Printf(lineRowContents[lineRowCount-lineIdx-1])
+			s.setCursorPosX(0)
+			y--
+			lineIdx++
+		}
+		cursorY -= lineIdx
+		r += lineRowCount
+	}
+}
+func (s *Block) calRowContents(content string) []string {
+	lineCount := 1
+	cursorX := 0
+	subStr := ""
+	lines := []string{}
+	for _, c := range content {
+		if c == '\n' || cursorX+len(subStr)+1 > s.width {
+			lineCount++
+			lines = append(lines, subStr)
+			subStr = ""
+			cursorX = 0
+			if c != '\n' {
+				subStr = string(c)
+			}
+		} else {
+			subStr += string(c)
+		}
+	}
+	lines = append(lines, subStr)
+	return lines
 }
 func (s *Block) Printf(format string, argv ...interface{}) {
 	s.applyCursorPos()

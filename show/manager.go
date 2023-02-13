@@ -38,6 +38,9 @@ func (s *Manager) FlushDraw(block IDrawable) {
 	s.drawCh <- block
 }
 
+func (s *Manager) SetCursorPos(row, col int) {
+	s.controller.SetCursorPos(row, col)
+}
 func (s *Manager) update() {
 	exit := false
 	for !exit {

@@ -5,4 +5,5 @@ type IShellHooker interface {
 	KeyEnter()
 	KeyAfterEnter()
 	KeyTable()
+	KeyBeforeBackspace() bool
 }
