@@ -8,7 +8,13 @@ type Pos struct {
 	X int
 	Y int
 }
-
+type IKeyHooker interface {
+	CurrentLineChange()
+	KeyEnter()
+	KeyAfterEnter()
+	KeyTable()
+	KeyBeforeBackspace() bool
+}
 type IDataSource interface {
 	LinesData() []string
 	// Data() string
@@ -19,8 +25,14 @@ type IDataListener interface {
 }
 
 type IInputReceiver interface {
-	InputChar(char rune)
+	IKeyInputReceiver
+	ITextInputReceiver
+}
+type IKeyInputReceiver interface {
 	InputKey(key keyboard.Key)
+}
+type ITextInputReceiver interface {
+	InputChar(char rune)
 }
 
 type ICmdReceiver interface {

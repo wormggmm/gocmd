@@ -37,7 +37,7 @@ func (s *Shell) KeyEnter() {
 	}
 }
 func (s *Shell) setCurrentLine(content string) {
-	s.BaseShell.SetCurrentLine(">" + content)
+	s.SetCurrentLine(">" + content)
 }
 func (s *Shell) getCurrentLine() string {
 	cmd := s.CurrentLine()

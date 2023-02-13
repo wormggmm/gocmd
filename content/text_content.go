@@ -1,4 +1,4 @@
-package common
+package content
 
 type TextContent struct {
 	lines       []string

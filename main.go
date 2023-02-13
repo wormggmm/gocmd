@@ -3,8 +3,12 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/wormggmm/gocmd/controller"
 
 	"github.com/wormggmm/gocmd/shell"
 
@@ -13,12 +17,9 @@ import (
 )
 
 type TestDataSource struct {
-	Str string
+	*controller.BaseController
 }
 
-func (s *TestDataSource) Data() string {
-	return s.Str
-}
 func main() {
 	linesStr := "50"
 	columnsStr := "200"
@@ -41,19 +42,31 @@ func main() {
 	c := &common.ScreenController{}
 	c.Reset()
 	c.ClearAll()
-	// dataSrc := &TestDataSource{}
-	// b1 := show.NewBlock(2, 2, 5, 10, dataSrc)
-	// b1.SetFrame('*', true, common.EnumColor.Red)
+	dataSrc := &TestDataSource{
+		BaseController: controller.NewBaseController(nil),
+	}
+	b1 := show.NewBlock(2, 2, 30, 30, dataSrc)
+	b1.SetFrame('*', true, common.EnumColor.Red)
 	mgr := show.NewManager()
-	// mgr.AddBlock(b1)
+	mgr.AddBlock(b1)
 	mgr.Start()
 	mgr.SetCursorPos(0, 0)
 	input := shell.NewInput()
 	sh := shell.NewShell()
 	testShellProcessor := &TestShellProcessor{cmd: func(cmd string) {
-		if cmd == "exit" {
+		switch cmd {
+		case "exit":
 			input.Stop()
 			os.Exit(0)
+		default:
+			cmdAndArgc := strings.Split(cmd, " ")
+			c := exec.Command(cmdAndArgc[0], cmdAndArgc[1:]...)
+			output, err := c.Output()
+			if err != nil {
+				fmt.Println("exec err:", err)
+				break
+			}
+			dataSrc.Input(string(output))
 		}
 	},
 		cmdList: func() []string {
