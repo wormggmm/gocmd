@@ -36,7 +36,9 @@ func NewBlock(row, col, height, width int, dataSrc common.IDataSource) *Block {
 		dataSrc:    dataSrc,
 		frameColor: common.EnumColor.Idle,
 	}
-	dataSrc.Listener(b)
+	if dataSrc != nil {
+		dataSrc.Listener(b)
+	}
 	return b
 }
 func (s *Block) SetManager(manager *Manager) {
@@ -122,14 +124,16 @@ func (s *Block) drawFrame() {
 	s.controller.Reset()
 }
 func (s *Block) Draw() {
+	s.Clear()
+	s.drawFrame()
 	if s.dataSrc == nil {
 		return
 	}
-	s.Clear()
-	s.drawFrame()
 	s.setCursorPos(0, 0)
 	// s.Printf(s.dataSrc.Data())
-	s.PrintLines(s.dataSrc.LinesData())
+	if s.dataSrc != nil {
+		s.PrintLines(s.dataSrc.LinesData())
+	}
 }
 func (s *Block) PrintLines(lines []string) {
 	lineCount := len(lines)

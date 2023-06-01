@@ -30,6 +30,11 @@ func NewProgressBar(tag string, char rune, length int, charEmpty ...rune) *Progr
 	return pb
 }
 func (s *ProgressBar) Listener(listener common.IDataListener) {}
+
+func (s *ProgressBar) LinesData() []string {
+	return []string{s.Data()}
+}
+
 func (s *ProgressBar) Set(progress float64) {
 	s.progress = progress
 }

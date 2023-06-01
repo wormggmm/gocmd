@@ -9,8 +9,8 @@ type BaseShell struct {
 	*controller.BaseController
 }
 
-func NewBaseShell(hooker common.IKeyHooker) *BaseShell {
+func NewBaseShell(content common.ITextContent, contentHooker common.IContentHooker, hooker common.IKeyHooker) *BaseShell {
 	return &BaseShell{
-		BaseController: controller.NewBaseController(hooker),
+		BaseController: controller.NewBaseController(content, contentHooker, hooker),
 	}
 }

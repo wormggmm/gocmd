@@ -8,14 +8,18 @@ import (
 
 type BaseController struct {
 	*content.TextContent
-	hooker   common.IKeyHooker
-	listener common.IDataListener
+	childContent  common.ITextContent
+	contentHooker common.IContentHooker
+	hooker        common.IKeyHooker
+	listener      common.IDataListener
 }
 
-func NewBaseController(hooker common.IKeyHooker) *BaseController {
+func NewBaseController(childContent common.ITextContent, contentHooker common.IContentHooker, hooker common.IKeyHooker) *BaseController {
 	return &BaseController{
-		TextContent: &content.TextContent{},
-		hooker:      hooker,
+		TextContent:   &content.TextContent{},
+		hooker:        hooker,
+		childContent:  childContent,
+		contentHooker: contentHooker,
 	}
 }
 func (s *BaseController) Listener(listener common.IDataListener) {
@@ -29,7 +33,7 @@ func (s *BaseController) Input(content string) {
 func (s *BaseController) InputChar(char rune) {
 	s.TextContent.InputChar(char)
 	if s.hooker != nil {
-		s.hooker.CurrentLineChange()
+		s.contentHooker.CurrentLineChange()
 	}
 	if s.listener != nil {
 		s.listener.DataChanged()
@@ -39,13 +43,15 @@ func (s *BaseController) InputKey(key keyboard.Key) {
 	switch key {
 	case keyboard.KeySpace:
 		if s.hooker != nil {
-			s.hooker.CurrentLineChange()
+			s.contentHooker.CurrentLineChange()
 		}
 		s.InputChar(' ')
+	case keyboard.KeyCtrlU:
+		s.childContent.SetCurrentLine("")
 	case keyboard.KeyEnter:
 		if s.hooker != nil {
 			s.hooker.KeyEnter()
-			s.hooker.CurrentLineChange()
+			s.contentHooker.CurrentLineChange()
 		}
 		s.EnterLine()
 		if s.hooker != nil {
@@ -58,7 +64,7 @@ func (s *BaseController) InputKey(key keyboard.Key) {
 			}
 			s.BackSpace()
 			if s.hooker != nil {
-				s.hooker.CurrentLineChange()
+				s.contentHooker.CurrentLineChange()
 			}
 		}
 	case keyboard.KeyTab:

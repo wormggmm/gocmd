@@ -8,8 +8,13 @@ type Pos struct {
 	X int
 	Y int
 }
-type IKeyHooker interface {
+type IContentHooker interface {
 	CurrentLineChange()
+}
+type ITextContent interface {
+	SetCurrentLine(content string)
+}
+type IKeyHooker interface {
 	KeyEnter()
 	KeyAfterEnter()
 	KeyTable()
@@ -17,7 +22,6 @@ type IKeyHooker interface {
 }
 type IDataSource interface {
 	LinesData() []string
-	// Data() string
 	Listener(listener IDataListener)
 }
 type IDataListener interface {
@@ -37,6 +41,5 @@ type ITextInputReceiver interface {
 
 type ICmdReceiver interface {
 	Cmd(cmd string)
-	// CmdTable(cmd string)
 	CmdList() []string
 }

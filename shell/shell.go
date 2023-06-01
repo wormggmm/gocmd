@@ -14,7 +14,7 @@ type Shell struct {
 
 func NewShell() *Shell {
 	sh := &Shell{}
-	sh.BaseShell = NewBaseShell(sh)
+	sh.BaseShell = NewBaseShell(sh, sh, sh)
 	sh.BaseShell.InputChar('>')
 	return sh
 }
@@ -22,7 +22,7 @@ func (s *Shell) SetReceiver(receiver common.ICmdReceiver) {
 	s.receiver = receiver
 }
 func (s *Shell) KeyBeforeBackspace() (isBreak bool) {
-	if len(s.getCurrentLine()) == 1 && s.getCurrentLine()[0] == '>' {
+	if len(s.CurrentLine()) == 1 && s.CurrentLine()[0] == '>' {
 		return true
 	}
 	return false
@@ -36,8 +36,8 @@ func (s *Shell) KeyEnter() {
 		s.receiver.Cmd(cmd)
 	}
 }
-func (s *Shell) setCurrentLine(content string) {
-	s.SetCurrentLine(">" + content)
+func (s *Shell) SetCurrentLine(content string) {
+	s.BaseShell.SetCurrentLine(">" + content)
 }
 func (s *Shell) getCurrentLine() string {
 	cmd := s.CurrentLine()
@@ -56,13 +56,13 @@ func (s *Shell) KeyTable() {
 			if strings.Index(cmd, currentCmd) == 0 {
 				// s.content += cmd + "\t"
 				// s.currentLine += cmd + "\t"
-				s.SetCurrentLine(s.getCurrentLine() + cmd + "\t")
+				s.BaseShell.SetCurrentLine(s.getCurrentLine() + cmd + "\t")
 			}
 		}
 		// s.InputChar('\n')
 		// s.content += currentCmd
 		s.EnterLine()
-		s.setCurrentLine(currentCmd)
+		s.SetCurrentLine(currentCmd)
 	}
 	s.tableKey = true
 }
